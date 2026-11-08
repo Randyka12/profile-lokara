@@ -1,10 +1,11 @@
 /**
- * Menerima data pendaftaran dari form landing page dan mengirimkannya ke WhatsApp
- * melalui gateway Fonnte.
+ * Menerima data pendaftaran dari form landing page dan mengirimkannya ke email
+ * melalui Resend.
  *
- * Environment variable yang dibutuhkan (diatur di dashboard Vercel):
- * - FONNTE_TOKEN : token perangkat dari dashboard Fonnte
- * - WA_TARGET    : nomor WhatsApp tujuan, format 62xxxxxxxxxx (atau nomor grup Fonnte)
+ * Environment variable (di .env untuk lokal dan di dashboard Vercel untuk produksi):
+ * - RESEND_API_KEY          : API key dari resend.com (wajib)
+ * - REGISTRATION_EMAIL_TO   : alamat email tujuan (default: muhammadrandykarna@gmail.com)
+ * - REGISTRATION_EMAIL_FROM : pengirim; tanpa domain terverifikasi gunakan onboarding@resend.dev
  */
 const MAX_LENGTH = 200;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -18,18 +19,33 @@ const normalizePhone = (value) => {
   return digits;
 };
 
-const buildMessage = (fields) =>
-  [
-    '*Pendaftaran Baru Lokara POS*',
-    '',
-    `Paket: ${fields.plan || '-'}`,
-    `Nama Usaha: ${fields.businessName}`,
-    `Nama Pemilik: ${fields.ownerName}`,
-    `Email: ${fields.email}`,
-    `No. WhatsApp: ${fields.phone}`,
-    `Jenis Usaha: ${fields.businessType}`,
-    `Catatan: ${fields.notes || '-'}`,
-  ].join('\n');
+const buildSummaryLines = (fields) => [
+  `Paket: ${fields.plan || '-'}`,
+  `Nama Usaha: ${fields.businessName}`,
+  `Nama Pemilik: ${fields.ownerName}`,
+  `Email: ${fields.email}`,
+  `No. WhatsApp: ${fields.phone}`,
+  `Jenis Usaha: ${fields.businessType}`,
+  `Catatan: ${fields.notes || '-'}`,
+];
+
+const sendEmail = async (fields) => {
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: process.env.REGISTRATION_EMAIL_FROM || 'Lokara POS <onboarding@resend.dev>',
+      to: [process.env.REGISTRATION_EMAIL_TO || 'muhammadrandykarna@gmail.com'],
+      reply_to: fields.email,
+      subject: `Pendaftaran Baru Lokara POS: ${fields.businessName}`,
+      text: ['Ada pendaftaran baru dari landing page Lokara POS.', '', ...buildSummaryLines(fields)].join('\n'),
+    }),
+  });
+  return response.ok;
+};
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -63,33 +79,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, message: 'Nomor WhatsApp belum benar.' });
   }
 
-  const token = process.env.FONNTE_TOKEN;
-  const target = process.env.WA_TARGET;
-  if (!token || !target) {
+  if (!process.env.RESEND_API_KEY) {
     return res.status(500).json({ ok: false, message: 'Layanan pendaftaran belum dikonfigurasi.' });
   }
 
   try {
-    const response = await fetch('https://api.fonnte.com/send', {
-      method: 'POST',
-      headers: {
-        Authorization: token,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        target,
-        message: buildMessage(fields),
-        countryCode: '62',
-      }),
-    });
-    const result = await response.json().catch(() => ({}));
-
-    if (!response.ok || result.status !== true) {
+    const sent = await sendEmail(fields);
+    if (!sent) {
       return res.status(502).json({ ok: false, message: 'Gagal mengirim pendaftaran. Silakan coba lagi.' });
     }
-
     return res.status(200).json({ ok: true });
   } catch (error) {
-    return res.status(502).json({ ok: false, message: 'Gagal terhubung ke layanan WhatsApp. Silakan coba lagi.' });
+    return res.status(502).json({ ok: false, message: 'Gagal terhubung ke layanan email. Silakan coba lagi.' });
   }
 }

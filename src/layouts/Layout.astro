@@ -40,6 +40,14 @@ const { description, title, image } = Astro.props;
       body {
         font-family: "Inter", sans-serif;
       }
+      html {
+        scroll-behavior: smooth;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
       .sticky-header {
         @apply fixed z-[9999] bg-white/80 dark:bg-dark/80 transition;
         backdrop-filter: blur(5px);
