@@ -9,32 +9,27 @@ interface Props {
   image?: string;
 }
 
-const { description, title, image = '/assets/logo/logo-lokarapos-wordmark.png' } = Astro.props;
+const { description, title, image } = Astro.props;
 ---
 
 <!DOCTYPE html>
 <html lang="id">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#F97316" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
     <meta property="og:image" content={image} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content={image} />
+    <meta property="twitter:image" content={image} />
     <title>{title}</title>
   </head>
-  <body class="bg-white font-sans text-dark antialiased">
+  <body>
     <Header />
+    <!-- <Header client:load /> -->
     <main>
       <slot />
     </main>
@@ -45,12 +40,41 @@ const { description, title, image = '/assets/logo/logo-lokarapos-wordmark.png' }
       body {
         font-family: "Inter", sans-serif;
       }
-      html {
-        scroll-behavior: smooth;
+      .sticky-header {
+        @apply fixed z-[9999] bg-white/80 dark:bg-dark/80 transition;
+        backdrop-filter: blur(5px);
+        box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
       }
-      .header-nav-link {
-        @apply text-sm font-medium text-body-color hover:text-primary transition;
+
+      .sticky-header .navbar-logo {
+        @apply py-2;
       }
+
+      .sticky-header #navbarToggler span {
+        @apply bg-dark dark:bg-white;
+      }
+
+      .sticky-header #navbarCollapse li > a {
+        @apply text-dark dark:text-white hover:text-primary dark:hover:text-primary hover:opacity-100;
+      }
+      #navbarCollapse li .ud-menu-scroll.active {
+        @apply opacity-70;
+      }
+      .sticky-header #navbarCollapse li .ud-menu-scroll.active {
+        @apply text-primary opacity-100;
+      }
+      .sticky-header .loginBtn {
+        @apply text-dark dark:text-white hover:text-primary dark:hover:text-primary hover:opacity-100;
+      }
+
+      .sticky-header .signUpBtn {
+        @apply bg-primary text-white hover:bg-blue-dark hover:text-white;
+      }
+
+      .sticky-header #themeSwitcher span {
+        @apply text-dark dark:text-white;
+      }
+
       .navbarTogglerActive > span:nth-child(1) {
         @apply top-[7px] rotate-45 transform;
       }
@@ -58,12 +82,32 @@ const { description, title, image = '/assets/logo/logo-lokarapos-wordmark.png' }
         @apply opacity-0;
       }
       .navbarTogglerActive > span:nth-child(3) {
-        @apply top-[-8px] -rotate-45 transform;
+        @apply top-[-8px] rotate-[135deg];
       }
+
+      .common-carousel .swiper-button-next:after,
+      .common-carousel .swiper-button-prev:after {
+        @apply hidden;
+      }
+
+      .common-carousel .swiper-button-next,
+      .common-carousel .swiper-button-prev {
+        @apply !static h-12 w-12 rounded-lg bg-white dark:bg-dark shadow-testimonial-btn text-dark dark:text-white m-0 ease-out duration-200 hover:bg-primary hover:text-white hover:shadow-none;
+      }
+
+      .common-carousel .swiper-button-next svg,
+      .common-carousel .swiper-button-prev svg {
+        @apply w-auto h-auto;
+      }
+
     </style>
     <script>
-      import "../scripts/landing.js";
+      import "../scripts/stickymenu.js";
+      import "../scripts/dropdown.js";
+      import "../scripts/darkMode.js";
       import "../scripts/scrolltop.js";
+      import "../scripts/scrollmenu.js";
+      import "../scripts/testimonial.js";
     </script>
   </body>
 </html>

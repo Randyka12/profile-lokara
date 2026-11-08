@@ -1,0 +1,246 @@
+---
+import { BUSINESS_TYPES } from '../utils/business-types.js';
+
+const inputClass =
+  'w-full rounded-md border border-stroke bg-white px-4 py-3 text-base text-dark placeholder:text-body-color/60 focus:border-primary focus:outline-none';
+const labelClass = 'mb-2 block text-sm font-medium text-dark';
+---
+
+<div
+  id="register-modal"
+  class="fixed inset-0 z-[10000] hidden items-center justify-center bg-dark/60 p-4"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="register-title"
+>
+  <div class="relative max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-xl bg-white p-6 shadow-pricing sm:p-10">
+    <button
+      type="button"
+      data-register-close
+      class="absolute right-4 top-4 text-2xl leading-none text-body-color hover:text-dark"
+      aria-label="Tutup"
+    >
+      &times;
+    </button>
+
+    <div data-register-form-view>
+      <h3 id="register-title" class="mb-2 pr-8 text-2xl font-bold text-dark">
+        Daftar Paket <span data-plan-label>Pro</span>
+      </h3>
+      <p class="mb-6 text-base text-body-color">
+        Isi data usaha Anda. Tim Lokara akan menghubungi Anda melalui WhatsApp.
+      </p>
+
+      <form id="register-form" novalidate class="space-y-4">
+        <div>
+          <label for="register-business-name" class={labelClass}>Nama Usaha*</label>
+          <input id="register-business-name" type="text" name="businessName" class={inputClass} placeholder="Contoh: Kopi Senja" maxlength="120" required />
+        </div>
+
+        <div>
+          <label for="register-owner-name" class={labelClass}>Nama Pemilik*</label>
+          <input id="register-owner-name" type="text" name="ownerName" class={inputClass} placeholder="Nama lengkap Anda" maxlength="120" required />
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="register-email" class={labelClass}>Email*</label>
+            <input id="register-email" type="email" name="email" class={inputClass} placeholder="contoh@email.com" maxlength="120" required />
+          </div>
+          <div>
+            <label for="register-phone" class={labelClass}>No. WhatsApp*</label>
+            <input id="register-phone" type="tel" name="phone" class={inputClass} placeholder="08xxxxxxxxxx" maxlength="20" inputmode="tel" required />
+          </div>
+        </div>
+
+        <div>
+          <label for="register-business-type" class={labelClass}>Jenis Usaha*</label>
+          <select id="register-business-type" name="businessType" class={inputClass} required>
+            <option value="">Pilih jenis usaha</option>
+            {BUSINESS_TYPES.map((type) => (
+              <option value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label for="register-notes" class={labelClass}>Catatan (opsional)</label>
+          <textarea id="register-notes" name="notes" rows="3" class={inputClass} placeholder="Jumlah outlet, kebutuhan printer, dll." maxlength="500"></textarea>
+        </div>
+
+        <input type="hidden" name="plan" data-plan-input value="" />
+
+        <!-- Honeypot: disembunyikan dari pengguna, hanya diisi bot -->
+        <div class="hidden" aria-hidden="true">
+          <label>Jangan isi kolom ini<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <p data-register-error class="hidden rounded-md bg-red-50 px-4 py-3 text-sm text-red-600"></p>
+
+        <button
+          type="submit"
+          data-submit
+          class="flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3 px-7 text-base font-medium text-white transition hover:bg-blue-dark disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          <svg data-spinner class="hidden h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
+            <path fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" class="opacity-75"></path>
+          </svg>
+          <span data-submit-text>Kirim Pendaftaran</span>
+        </button>
+      </form>
+    </div>
+
+    <div data-register-success-view class="hidden py-6 text-center">
+      <div class="register-check mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+        <svg class="h-10 w-10 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path class="register-draw" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <h3 class="mt-6 text-2xl font-bold text-dark">Berhasil Terkirim!</h3>
+      <p class="mx-auto mt-3 max-w-[380px] text-base text-body-color">
+        Data pendaftaran Anda sudah kami terima. Tim Lokara akan menghubungi Anda melalui WhatsApp.
+      </p>
+      <button
+        type="button"
+        data-register-close
+        class="mt-8 inline-flex items-center justify-center rounded-md bg-primary py-3 px-7 text-base font-medium text-white transition hover:bg-blue-dark"
+      >
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes register-pop {
+    from { transform: scale(0.4); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @keyframes register-draw {
+    to { stroke-dashoffset: 0; }
+  }
+  .register-check {
+    animation: register-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  }
+  .register-draw {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: register-draw 0.5s 0.3s ease-out forwards;
+  }
+</style>
+
+<script>
+  const modal = document.getElementById('register-modal') as HTMLElement | null;
+  const form = document.getElementById('register-form') as HTMLFormElement | null;
+
+  if (modal && form) {
+    const formView = modal.querySelector('[data-register-form-view]') as HTMLElement;
+    const successView = modal.querySelector('[data-register-success-view]') as HTMLElement;
+    const errorEl = modal.querySelector('[data-register-error]') as HTMLElement;
+    const submitBtn = modal.querySelector('[data-submit]') as HTMLButtonElement;
+    const submitText = modal.querySelector('[data-submit-text]') as HTMLElement;
+    const spinner = modal.querySelector('[data-spinner]') as HTMLElement;
+    const planLabel = modal.querySelector('[data-plan-label]') as HTMLElement;
+    const planInput = modal.querySelector('[data-plan-input]') as HTMLInputElement;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const showError = (message: string) => {
+      errorEl.textContent = message;
+      errorEl.classList.remove('hidden');
+    };
+
+    const hideError = () => {
+      errorEl.textContent = '';
+      errorEl.classList.add('hidden');
+    };
+
+    const setLoading = (isLoading: boolean) => {
+      submitBtn.disabled = isLoading;
+      spinner.classList.toggle('hidden', !isLoading);
+      submitText.textContent = isLoading ? 'Mengirim...' : 'Kirim Pendaftaran';
+    };
+
+    const showForm = () => {
+      formView.classList.remove('hidden');
+      successView.classList.add('hidden');
+    };
+
+    const showSuccess = () => {
+      formView.classList.add('hidden');
+      successView.classList.remove('hidden');
+    };
+
+    const openModal = (plan: string) => {
+      planLabel.textContent = plan;
+      planInput.value = plan;
+      hideError();
+      setLoading(false);
+      showForm();
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      (form.elements.namedItem('businessName') as HTMLInputElement).focus();
+    };
+
+    const closeModal = () => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    };
+
+    document.querySelectorAll<HTMLElement>('[data-register-open]').forEach((button) => {
+      button.addEventListener('click', () => openModal(button.dataset.plan || 'Pro'));
+    });
+
+    modal.querySelectorAll<HTMLElement>('[data-register-close]').forEach((button) => {
+      button.addEventListener('click', closeModal);
+    });
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      hideError();
+
+      const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+
+      if (!data.businessName?.trim() || !data.ownerName?.trim() || !data.businessType) {
+        showError('Nama usaha, nama pemilik, dan jenis usaha wajib diisi.');
+        return;
+      }
+      if (!emailPattern.test(data.email?.trim() || '')) {
+        showError('Format email belum benar.');
+        return;
+      }
+      if (!/^0?\d{8,14}$/.test((data.phone || '').replace(/\D/g, ''))) {
+        showError('Nomor WhatsApp belum benar.');
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await fetch('/api/send-registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.ok) {
+          throw new Error(result.message || 'Gagal mengirim pendaftaran. Silakan coba lagi.');
+        }
+        form.reset();
+        planInput.value = planLabel.textContent || '';
+        showSuccess();
+      } catch (error) {
+        showError(error instanceof Error ? error.message : 'Gagal mengirim pendaftaran.');
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
+</script>

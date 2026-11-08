@@ -2,44 +2,50 @@
 const priceboxes = [
   {
     popular:false,
-    packageName:"Starter",
-    price:'25.00',
-    subtitle:'Features',
-    btn:'Purchase Now',
-    purchaseLink:'/#',
+    packageName:"Basic",
+    price:'149.000',
+    subtitle:'Yang didapat',
+    btn:'Pilih Paket',
+    purchaseLink:'https://lokara.id/login',
     offerlist: [
-      {title: "Up to 1 User"},
-      {title: "All UI components"},
-      {title: "Lifetime access"},
-      {title: "Free updates"},
+      {title: "1 outlet"},
+      {title: "5 pengguna"},
+      {title: "500 produk"},
+      {title: "Kasir cepat"},
+      {title: "Manajemen stok sederhana"},
+      {title: "Multi-metode bayar"},
     ],
   },
   {
     popular:true,
-    packageName:"Basic",
-    price:'59.00',
-    subtitle:'Features',
-    btn:'Purchase Now',
-    purchaseLink:'/#',
+    packageName:"Pro",
+    price:'299.000',
+    subtitle:'Yang didapat',
+    btn:'Pilih Paket',
+    purchaseLink:'https://lokara.id/login',
     offerlist: [
-      {title: "Up to 1 User"},
-      {title: "All UI components"},
-      {title: "Lifetime access"},
-      {title: "Free updates"},
+      {title: "3 outlet"},
+      {title: "15 pengguna"},
+      {title: "5.000 produk"},
+      {title: "Modul resep (BOM) dan HPP otomatis"},
+      {title: "Multi-gudang dan transfer stok"},
+      {title: "Peringatan stok tipis dan expired"},
+      {title: "Pusat laporan laba rugi"},
     ],
   },
   {
     popular:false,
-    packageName:"Premium",
-    price:'99.00',
-    subtitle:'Features',
-    btn:'Purchase Now',
-    purchaseLink:'/#',
+    packageName:"Business",
+    price:'599.000',
+    subtitle:'Yang didapat',
+    btn:'Pilih Paket',
+    purchaseLink:'https://lokara.id/login',
     offerlist: [
-      {title: "Up to 1 User"},
-      {title: "All UI components"},
-      {title: "Lifetime access"},
-      {title: "Free updates"},
+      {title: "Outlet dan kasir tanpa batas"},
+      {title: "Semua fitur Pro"},
+      {title: "API terbuka dan webhook"},
+      {title: "Custom domain"},
+      {title: "Dukungan WhatsApp khusus 24/7"},
     ],
   },
 ]
@@ -55,14 +61,13 @@ const priceboxes = [
       <div class="w-full px-4">
         <div class="mx-auto mb-[60px] max-w-[510px] text-center">
           <span class="mb-2 block text-lg font-semibold text-primary">
-            Pricing Table
+            Harga
           </span>
           <h2 class="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:leading-[1.2] md:text-[40px]">
-            Awesome Pricing Plan
+            Pilih Paket Sesuai Skala Usaha
           </h2>
           <p class="text-base text-body-color dark:text-dark-6">
-            There are many variations of passages of Lorem Ipsum available
-            but the majority have suffered alteration in some form.
+            Mulai gratis 14 hari. Bayar tahunan dan dapatkan gratis 2 bulan.
           </p>
         </div>
       </div>
@@ -80,7 +85,7 @@ const priceboxes = [
                 <p
                   class="absolute right-[-50px] top-[60px] inline-block -rotate-90 rounded-tl-md rounded-bl-md bg-primary py-2 px-5 text-base font-medium text-white"
                 >
-                  Recommended
+                  Terpopuler
                 </p>
               )
             }
@@ -91,10 +96,10 @@ const priceboxes = [
               {pricebox.packageName}
             </span>
             <h2 class="mb-11 text-4xl font-semibold text-dark dark:text-white xl:leading-[1.21] xl:text-[42px]">
-              <span class="text-xl font-medium">$</span>
+              <span class="text-xl font-medium">Rp</span>
               <span class="ml-1 -tracking-[2px]">{pricebox.price}</span>
               <span class="text-base font-normal text-body-color dark:text-dark-6">
-                Per Month
+                per bulan
               </span>
             </h2>
   
@@ -112,12 +117,14 @@ const priceboxes = [
               </div>
             </div>
 
-            <a
-              href={pricebox.purchaseLink}
+            <button
+              type="button"
+              data-register-open
+              data-plan={pricebox.packageName}
               class={`inline-block rounded-md bg-primary py-3 px-7 text-center text-base font-medium text-white transition hover:bg-blue-dark`}
             >
               {pricebox.btn}
-            </a>
+            </button>
           </div>
         </div>
       ))}
