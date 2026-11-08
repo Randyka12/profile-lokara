@@ -1,0 +1,69 @@
+---
+import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import BackToTop from '../components/layout/BackToTop.astro';
+
+interface Props {
+  description: string;
+  title: string;
+  image?: string;
+}
+
+const { description, title, image = '/assets/logo/logo-lokarapos-wordmark.png' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#F97316" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={image} />
+    <title>{title}</title>
+  </head>
+  <body class="bg-white font-sans text-dark antialiased">
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+    <BackToTop />
+    <style is:global>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      .header-nav-link {
+        @apply text-sm font-medium text-body-color hover:text-primary transition;
+      }
+      .navbarTogglerActive > span:nth-child(1) {
+        @apply top-[7px] rotate-45 transform;
+      }
+      .navbarTogglerActive > span:nth-child(2) {
+        @apply opacity-0;
+      }
+      .navbarTogglerActive > span:nth-child(3) {
+        @apply top-[-8px] -rotate-45 transform;
+      }
+    </style>
+    <script>
+      import "../scripts/landing.js";
+      import "../scripts/scrolltop.js";
+    </script>
+  </body>
+</html>

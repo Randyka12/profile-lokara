@@ -1,0 +1,71 @@
+---
+import { LOKARA_APP_URL } from '../../utils/site.js';
+
+const menuitems = [
+  { title: 'Fitur', path: '/#fitur' },
+  { title: 'Untuk Owner', path: '/#owner' },
+  { title: 'Untuk Kasir', path: '/#kasir' },
+  { title: 'Harga', path: '/#harga' },
+  { title: 'FAQ', path: '/#faq' },
+];
+---
+
+<header class="ud-header fixed top-0 left-0 z-40 w-full bg-white/90 backdrop-blur transition-shadow">
+  <div class="container">
+    <div class="relative flex items-center justify-between py-3">
+      <a href="/" class="navbar-logo block w-44 sm:w-52" aria-label="Lokara POS - beranda">
+        <img
+          src="/assets/logo/logo-lokarapos-wordmark.png"
+          alt="Lokara POS"
+          width="955"
+          height="242"
+          class="header-logo h-auto w-full"
+        />
+      </a>
+
+      <button
+        id="navbarToggler"
+        type="button"
+        aria-label="Buka menu"
+        aria-controls="navbarCollapse"
+        aria-expanded="false"
+        class="block rounded-lg px-3 py-[6px] ring-primary focus:ring-2 lg:hidden"
+      >
+        <span class="relative my-[6px] block h-[2px] w-[26px] bg-dark transition"></span>
+        <span class="relative my-[6px] block h-[2px] w-[26px] bg-dark transition"></span>
+        <span class="relative my-[6px] block h-[2px] w-[26px] bg-dark transition"></span>
+      </button>
+
+      <nav
+        id="navbarCollapse"
+        class="absolute left-4 right-4 top-full hidden rounded-xl border border-stroke bg-white py-4 shadow-lg lg:static lg:flex lg:w-auto lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
+      >
+        <ul class="flex w-full flex-col gap-1 lg:w-auto lg:flex-row lg:items-center lg:gap-7">
+          {
+            menuitems.map((item) => (
+              <li>
+                <a href={item.path} class="header-nav-link block rounded-md px-4 py-2 lg:p-0">
+                  {item.title}
+                </a>
+              </li>
+            ))
+          }
+          <li class="mt-2 flex flex-col gap-2 px-4 lg:mt-0 lg:flex-row lg:items-center lg:gap-3 lg:px-0">
+            <a
+              href={LOKARA_APP_URL}
+              class="rounded-lg px-4 py-2 text-center text-sm font-semibold text-dark transition hover:text-primary"
+            >
+              Masuk
+            </a>
+            <a
+              href={LOKARA_APP_URL}
+              class="rounded-lg bg-primary px-5 py-2.5 text-center text-sm font-semibold text-white shadow-1 transition hover:bg-blue-dark"
+            >
+              Coba Gratis 14 Hari
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,62 @@
+---
+import { LOKARA_APP_URL } from '../../utils/site.js';
+
+const year = new Date().getFullYear();
+
+const footerLinks = [
+  { name: 'Fitur', href: '/#fitur' },
+  { name: 'Untuk Owner', href: '/#owner' },
+  { name: 'Untuk Kasir', href: '/#kasir' },
+  { name: 'Harga', href: '/#harga' },
+  { name: 'FAQ', href: '/#faq' },
+];
+---
+
+<footer class="border-t border-stroke bg-gray-1">
+  <div class="container py-12">
+    <div class="flex flex-col gap-10 md:flex-row md:justify-between">
+      <div class="max-w-sm">
+        <img
+          src="/assets/logo/logo-lokarapos-wordmark.png"
+          alt="Lokara POS"
+          width="955"
+          height="242"
+          class="h-auto w-44"
+        />
+        <p class="mt-4 text-sm leading-relaxed text-body-color">
+          Point of Sale multi-outlet dengan kalkulasi HPP per gram/ml dan stok bahan yang terpotong
+          otomatis setiap transaksi.
+        </p>
+      </div>
+
+      <nav aria-label="Footer">
+        <h3 class="mb-4 text-sm font-semibold text-dark">Navigasi</h3>
+        <ul class="grid grid-cols-2 gap-x-10 gap-y-2">
+          {
+            footerLinks.map((link) => (
+              <li>
+                <a href={link.href} class="text-sm text-body-color transition hover:text-primary">
+                  {link.name}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div>
+        <h3 class="mb-4 text-sm font-semibold text-dark">Mulai</h3>
+        <a
+          href={LOKARA_APP_URL}
+          class="inline-flex rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-dark"
+        >
+          Masuk ke Lokara POS
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-10 border-t border-stroke pt-6 text-center text-xs text-body-secondary">
+      &copy; {year} Lokara POS. Hak cipta dilindungi.
+    </div>
+  </div>
+</footer>

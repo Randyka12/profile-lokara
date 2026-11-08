@@ -1,0 +1,458 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { LOKARA_APP_URL } from '../utils/site.js';
+
+const ownerFeatures = [
+  {
+    title: 'Dasbor Real-Time',
+    description: 'Penjualan bersih, jumlah transaksi, dan margin kotor (penjualan dikurangi HPP) hari ini, bisa difilter per outlet.',
+  },
+  {
+    title: 'Multi-Outlet & Pajak',
+    description: 'Atur PB1/PPN, service charge, dan pembulatan total per cabang, lengkap dengan logo dan header struk masing-masing.',
+  },
+  {
+    title: 'Bahan Baku, Resep & HPP',
+    description: 'Resep (BOM) sampai satuan gram/ml, sub-resep, faktor susut, dan simulator kenaikan harga bahan.',
+  },
+  {
+    title: 'Stok & Opname',
+    description: 'Kartu stok yang tidak bisa diubah, transfer antar gudang atau cabang, opname buta, dan pantauan batch kedaluwarsa.',
+  },
+  {
+    title: 'Pembelian & Supplier',
+    description: 'Purchase order, penerimaan barang, retur, dan hutang supplier. Harga beli baru otomatis menghitung ulang HPP resep.',
+  },
+  {
+    title: 'Laba Rugi & Varians',
+    description: 'Laporan laba rugi real-time, beban operasional, arus kas, dan selisih pemakaian bahan (teoritis vs aktual) untuk mendeteksi kebocoran.',
+  },
+  {
+    title: 'Pelanggan & Promo',
+    description: 'Riwayat transaksi, profil pelanggan, tier member, poin loyalti, serta diskon dan promo yang terkontrol.',
+  },
+  {
+    title: 'Karyawan & Hak Akses',
+    description: 'Peran Owner, Manager, Kasir, Staf Gudang, dan Akuntan. Batasi tiap karyawan ke outlet tertentu dengan PIN 6 digit.',
+  },
+];
+
+const cashierFeatures = [
+  {
+    title: 'Katalog & Pencarian Kilat',
+    description: 'Grid menu per kategori dengan pencarian instan. Scanner barcode USB atau Bluetooth langsung memasukkan item ke keranjang.',
+  },
+  {
+    title: 'Varian & Modifier',
+    description: 'Pilih ukuran, topping, atau pilihan susu. Tambahkan catatan untuk barista atau dapur, misalnya "kurang manis" atau "es dipisah".',
+  },
+  {
+    title: 'Dine-in, Take-away & Delivery',
+    description: 'Pilih nomor meja, tahan pesanan (hold) dan lanjutkan nanti (recall) saat pelanggan masih menambah menu.',
+  },
+  {
+    title: 'Pembayaran Fleksibel',
+    description: 'Tunai dengan tombol nominal cepat dan kembalian otomatis, QRIS dinamis, kartu, e-wallet, dan split payment.',
+  },
+  {
+    title: 'Struk Thermal & WhatsApp',
+    description: 'Cetak struk 58mm atau 80mm lewat LAN, USB, Bluetooth, atau RawBT. Kirim struk digital langsung ke WhatsApp pelanggan.',
+  },
+  {
+    title: 'Shift & Kas Laci',
+    description: 'Buka shift dengan modal awal, catat kas masuk dan keluar, lalu tutup shift dengan rekonsiliasi kas dan laporan ringkas.',
+  },
+];
+
+const industries = [
+  { name: 'Kafe & Restoran', description: 'Resep, meja, modifier, dan HPP per cup atau porsi.' },
+  { name: 'Retail & Minimarket', description: 'Barcode, stok per gudang, dan harga grosir.' },
+  { name: 'Laundry & Jasa', description: 'Transaksi kiloan dan status pengerjaan pesanan.' },
+  { name: 'Barbershop & Salon', description: 'Daftar layanan dan komisi per staf.' },
+];
+
+const plans = [
+  {
+    name: 'Trial 14 Hari',
+    badge: 'Uji Coba',
+    price: 'Gratis',
+    priceNote: 'Selama 14 hari',
+    yearly: null,
+    limits: '1 outlet · 2 pengguna · 50 produk',
+    features: ['Kasir Cepat', 'Laporan Dasar', 'Struk Digital WhatsApp'],
+    featured: false,
+  },
+  {
+    name: 'Basic',
+    badge: 'Pemula',
+    price: 'Rp149.000',
+    priceNote: 'per bulan',
+    yearly: 'atau Rp1.490.000 per tahun (gratis 2 bulan)',
+    limits: '1 outlet · 5 pengguna · 500 produk',
+    features: ['Kasir Cepat', 'Manajemen Stok Sederhana', 'Multi-Metode Bayar', 'Laporan Penjualan Lengkap'],
+    featured: false,
+  },
+  {
+    name: 'Pro',
+    badge: 'Terpopuler',
+    price: 'Rp299.000',
+    priceNote: 'per bulan',
+    yearly: 'atau Rp2.990.000 per tahun (gratis 2 bulan)',
+    limits: '3 outlet · 15 pengguna · 5.000 produk',
+    features: ['Semua fitur Basic', 'Modul Resep (BOM) & HPP Otomatis', 'Multi-Gudang & Transfer Stok', 'Peringatan Stok Tipis & Expired', 'Pusat Laporan Laba Rugi'],
+    featured: true,
+  },
+  {
+    name: 'Business',
+    badge: 'Enterprise',
+    price: 'Rp599.000',
+    priceNote: 'per bulan',
+    yearly: 'atau Rp5.990.000 per tahun (gratis 2 bulan)',
+    limits: 'Outlet & kasir tanpa batas',
+    features: ['Semua fitur Pro', 'Unlimited outlet & kasir', 'API terbuka & webhook', 'Custom domain', 'Dukungan WhatsApp khusus'],
+    featured: false,
+  },
+];
+
+const faqs = [
+  {
+    question: 'Apakah perlu kartu kredit untuk mencoba?',
+    answer: 'Tidak. Uji coba 14 hari tidak memerlukan kartu kredit. Anda bisa memilih paket berbayar kapan saja.',
+  },
+  {
+    question: 'Perangkat apa saja yang bisa dipakai?',
+    answer: 'Lokara POS berbasis web responsif. Bisa dipakai di tablet Android atau iPad, layar sentuh Windows atau Mac, dan smartphone.',
+  },
+  {
+    question: 'Printer struk apa yang didukung?',
+    answer: 'Printer thermal 58mm dan 80mm lewat jaringan LAN/WiFi, USB, Bluetooth, atau aplikasi RawBT di Android. Laci kas bisa dibuka otomatis saat pembayaran tunai.',
+  },
+  {
+    question: 'Bagaimana stok bahan dihitung?',
+    answer: 'Setiap penjualan memotong stok bahan baku sesuai resep secara otomatis. Selisih antara pemakaian teoritis dan aktual bisa dipantau di laporan varians.',
+  },
+  {
+    question: 'Bisa dipakai untuk beberapa cabang?',
+    answer: 'Bisa. Paket Pro mendukung hingga 3 outlet dan paket Business mendukung outlet tanpa batas, dengan stok dan karyawan yang dipisah per cabang.',
+  },
+];
+---
+
+<Layout
+  title="Lokara POS | Kasir, Stok & HPP Otomatis untuk Usaha Anda"
+  description="Lokara POS adalah sistem kasir multi-outlet dengan kalkulasi HPP per gram/ml, stok bahan yang terpotong otomatis, dan laporan laba rugi real-time untuk owner."
+>
+  <!-- ===== Hero ===== -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-orange-50/80 to-white pt-32 pb-20 lg:pt-40 lg:pb-28">
+    <div class="container">
+      <div class="grid items-center gap-14 lg:grid-cols-2">
+        <div>
+          <span class="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-3 py-1 text-xs font-semibold text-orange-600">
+            <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+            Multi-outlet · Multi-tenant · F&amp;B dan Retail
+          </span>
+          <h1 class="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-dark sm:text-5xl">
+            Kasir Cepat, Stok Otomatis, dan <span class="text-primary">HPP Akurat</span> dalam Satu POS
+          </h1>
+          <p class="mt-6 max-w-xl text-base leading-relaxed text-body-color sm:text-lg">
+            Kasir melayani pelanggan di layar sentuh, sementara owner memantau penjualan dan laba dari mana saja.
+            Setiap transaksi langsung memotong stok bahan sesuai resep.
+          </p>
+          <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+            <a
+              href={LOKARA_APP_URL}
+              class="inline-flex items-center justify-center rounded-lg bg-primary px-7 py-3.5 text-base font-semibold text-white shadow-1 transition hover:bg-blue-dark"
+            >
+              Coba Gratis 14 Hari
+            </a>
+            <a
+              href="#kasir"
+              class="inline-flex items-center justify-center rounded-lg border border-stroke bg-white px-7 py-3.5 text-base font-semibold text-dark transition hover:border-primary hover:text-primary"
+            >
+              Lihat Fitur Kasir
+            </a>
+          </div>
+          <p class="mt-4 text-sm text-body-secondary">Tanpa kartu kredit.</p>
+        </div>
+
+        <!-- Mockup layar kasir (contoh tampilan) -->
+        <div class="relative mx-auto w-full max-w-lg">
+          <div class="absolute -left-4 -top-4 h-full w-full rounded-3xl bg-orange-100"></div>
+          <div class="relative overflow-hidden rounded-3xl border border-stroke bg-white shadow-pricing">
+            <div class="flex items-center justify-between border-b border-stroke bg-gray-1 px-5 py-3">
+              <div class="flex items-center gap-2">
+                <span class="h-2.5 w-2.5 rounded-full bg-orange-400"></span>
+                <span class="h-2.5 w-2.5 rounded-full bg-orange-300"></span>
+                <span class="h-2.5 w-2.5 rounded-full bg-orange-200"></span>
+              </div>
+              <span class="text-xs font-semibold text-body-color">Kasir · Outlet Pusat</span>
+            </div>
+            <div class="grid grid-cols-5">
+              <div class="col-span-3 space-y-3 border-r border-stroke p-5">
+                <p class="text-xs font-semibold uppercase tracking-wide text-body-secondary">Pesanan</p>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="font-medium text-dark">2× Kopi Susu Gula Aren</span>
+                  <span class="text-dark">Rp44.000</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="font-medium text-dark">1× Americano Iced</span>
+                  <span class="text-dark">Rp20.000</span>
+                </div>
+                <p class="text-xs text-body-secondary">Catatan: kurang manis</p>
+                <div class="mt-4 border-t border-stroke pt-3">
+                  <div class="flex items-center justify-between text-sm font-bold text-dark">
+                    <span>Total</span>
+                    <span>Rp64.000</span>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2">
+                  <span class="rounded-lg bg-primary py-2 text-center text-xs font-semibold text-white">QRIS</span>
+                  <span class="rounded-lg border border-stroke py-2 text-center text-xs font-semibold text-dark">Tunai</span>
+                </div>
+              </div>
+              <div class="col-span-2 space-y-3 bg-orange-50/60 p-5">
+                <p class="text-xs font-semibold uppercase tracking-wide text-body-secondary">Hari ini</p>
+                <div>
+                  <p class="text-xs text-body-color">Laba kotor</p>
+                  <p class="text-xl font-extrabold text-dark">Rp1,2jt</p>
+                </div>
+                <div>
+                  <p class="text-xs text-body-color">Transaksi</p>
+                  <p class="text-xl font-extrabold text-dark">86</p>
+                </div>
+                <div class="rounded-lg bg-white p-2 shadow-1">
+                  <p class="text-[11px] text-body-color">Stok susu UHT</p>
+                  <p class="text-xs font-semibold text-orange-600">Tersisa 3,2 L</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-3 text-center text-xs text-body-secondary">Contoh tampilan, bukan data nyata.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Strip keunggulan ===== -->
+  <section class="border-y border-stroke bg-white">
+    <div class="container grid grid-cols-2 gap-6 py-8 text-center lg:grid-cols-4">
+      <div>
+        <p class="text-2xl font-extrabold text-primary">Gram/ml</p>
+        <p class="mt-1 text-sm text-body-color">Presisi HPP sampai satuan terkecil</p>
+      </div>
+      <div>
+        <p class="text-2xl font-extrabold text-primary">Otomatis</p>
+        <p class="mt-1 text-sm text-body-color">Stok bahan terpotong saat pembayaran</p>
+      </div>
+      <div>
+        <p class="text-2xl font-extrabold text-primary">Multi-Outlet</p>
+        <p class="mt-1 text-sm text-body-color">Cabang, gudang, dan karyawan terpisah</p>
+      </div>
+      <div>
+        <p class="text-2xl font-extrabold text-primary">Split Payment</p>
+        <p class="mt-1 text-sm text-body-color">Tunai, QRIS, dan kartu dalam satu transaksi</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Owner ===== -->
+  <section id="owner" class="scroll-mt-24 py-20 lg:py-28">
+    <div class="container">
+      <div class="mx-auto max-w-2xl text-center">
+        <p class="text-sm font-semibold uppercase tracking-wide text-primary">Untuk Owner &amp; Manajemen</p>
+        <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">
+          Pantau semua outlet dari satu dasbor
+        </h2>
+        <p class="mt-4 text-base text-body-color">
+          Dari bahan baku sampai laba bersih, semua angka terhubung. Keputusan belanja dan harga jual jadi lebih tepat.
+        </p>
+      </div>
+      <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          ownerFeatures.map((feature) => (
+            <div class="rounded-2xl border border-stroke bg-white p-6 transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-2">
+              <span class="mb-4 inline-block h-9 w-9 rounded-lg bg-orange-100"></span>
+              <h3 class="text-base font-bold text-dark">{feature.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-body-color">{feature.description}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Kasir ===== -->
+  <section id="kasir" class="scroll-mt-24 bg-gray-1 py-20 lg:py-28">
+    <div class="container">
+      <div class="grid items-center gap-14 lg:grid-cols-2">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-wide text-primary">Untuk Kasir</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">
+            Layar sentuh yang cepat dan minim salah hitung
+          </h2>
+          <p class="mt-4 text-base text-body-color">
+            Dirancang untuk antrean yang ramai. Kasir cukup ketuk menu, pilih modifier, lalu bayar tanpa banyak langkah.
+          </p>
+          <ul class="mt-8 space-y-3 text-sm text-dark">
+            <li class="flex gap-3"><span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary"></span>Otorisasi PIN manajer untuk void, diskon besar, refund, dan buka laci tanpa transaksi.</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary"></span>Ganti kasir cepat dengan PIN 6 digit tanpa logout dari browser.</li>
+            <li class="flex gap-3"><span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary"></span>Riwayat transaksi dan struk bisa dibuka ulang kapan saja di backoffice.</li>
+          </ul>
+        </div>
+        <div class="grid gap-5 sm:grid-cols-2">
+          {
+            cashierFeatures.map((feature) => (
+              <div class="rounded-2xl bg-white p-6 shadow-1">
+                <h3 class="text-base font-bold text-dark">{feature.title}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-body-color">{feature.description}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Alur ===== -->
+  <section class="py-20 lg:py-28">
+    <div class="container">
+      <div class="mx-auto max-w-2xl text-center">
+        <p class="text-sm font-semibold uppercase tracking-wide text-primary">Cara Kerja</p>
+        <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">Tiga langkah menuju kasir yang rapi</h2>
+      </div>
+      <ol class="mt-14 grid gap-6 md:grid-cols-3">
+        <li class="rounded-2xl border border-stroke p-8">
+          <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-bold text-white">1</span>
+          <h3 class="mt-5 text-lg font-bold text-dark">Atur produk dan resep</h3>
+          <p class="mt-2 text-sm leading-relaxed text-body-color">Masukkan menu, varian, dan resep. Lokara menghitung HPP setiap porsi dari harga bahan terbaru.</p>
+        </li>
+        <li class="rounded-2xl border border-stroke p-8">
+          <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-bold text-white">2</span>
+          <h3 class="mt-5 text-lg font-bold text-dark">Kasir melayani pelanggan</h3>
+          <p class="mt-2 text-sm leading-relaxed text-body-color">Transaksi tersimpan dengan snapshot HPP. Stok bahan terpotong otomatis, dan struk langsung tercetak.</p>
+        </li>
+        <li class="rounded-2xl border border-stroke p-8">
+          <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-bold text-white">3</span>
+          <h3 class="mt-5 text-lg font-bold text-dark">Owner memantau laba</h3>
+          <p class="mt-2 text-sm leading-relaxed text-body-color">Lihat laba rugi, varians bahan, dan performa tiap outlet dari HP kapan saja.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== Industri ===== -->
+  <section class="bg-gray-1 py-20 lg:py-24">
+    <div class="container">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">Cocok untuk berbagai jenis usaha</h2>
+        <p class="mt-4 text-base text-body-color">Pengaturan awal menyesuaikan jenis usaha Anda, jadi tidak perlu mulai dari nol.</p>
+      </div>
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          industries.map((industry) => (
+            <div class="rounded-2xl bg-white p-6 shadow-1">
+              <h3 class="text-base font-bold text-dark">{industry.name}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-body-color">{industry.description}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Harga ===== -->
+  <section id="harga" class="scroll-mt-24 py-20 lg:py-28">
+    <div class="container">
+      <div class="mx-auto max-w-2xl text-center">
+        <p class="text-sm font-semibold uppercase tracking-wide text-primary">Harga</p>
+        <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">Pilih paket sesuai skala usaha</h2>
+        <p class="mt-4 text-base text-body-color">Mulai gratis selama 14 hari. Bayar tahunan dan dapatkan gratis 2 bulan.</p>
+      </div>
+      <div class="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {
+          plans.map((plan) => (
+            <div
+              class:list={[
+                'relative flex flex-col rounded-2xl border p-7',
+                plan.featured ? 'border-primary bg-orange-50/40 shadow-pricing' : 'border-stroke bg-white',
+              ]}
+            >
+              {plan.featured && (
+                <span class="absolute -top-3 left-7 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white">
+                  {plan.badge}
+                </span>
+              )}
+              {!plan.featured && (
+                <span class="text-xs font-semibold uppercase tracking-wide text-body-secondary">{plan.badge}</span>
+              )}
+              <h3 class="mt-2 text-xl font-bold text-dark">{plan.name}</h3>
+              <p class="mt-4 text-3xl font-extrabold text-dark">{plan.price}</p>
+              <p class="text-sm text-body-color">{plan.priceNote}</p>
+              {plan.yearly && <p class="mt-2 text-xs text-body-secondary">{plan.yearly}</p>}
+              <p class="mt-5 rounded-lg bg-gray-1 px-3 py-2 text-xs font-medium text-dark">{plan.limits}</p>
+              <ul class="mt-5 flex-1 space-y-2.5 text-sm text-body-color">
+                {plan.features.map((feature) => (
+                  <li class="flex gap-2.5">
+                    <span class="mt-1 text-primary">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href={LOKARA_APP_URL}
+                class:list={[
+                  'mt-7 block rounded-lg px-5 py-3 text-center text-sm font-semibold transition',
+                  plan.featured ? 'bg-primary text-white hover:bg-blue-dark' : 'border border-stroke text-dark hover:border-primary hover:text-primary',
+                ]}
+              >
+                {plan.name === 'Trial 14 Hari' ? 'Mulai Uji Coba' : 'Pilih Paket'}
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq" class="scroll-mt-24 bg-gray-1 py-20 lg:py-24">
+    <div class="container">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">Pertanyaan yang sering diajukan</h2>
+      </div>
+      <div class="mx-auto mt-12 max-w-3xl space-y-4">
+        {
+          faqs.map((faq) => (
+            <details class="group rounded-2xl border border-stroke bg-white p-6 open:shadow-1">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-semibold text-dark">
+                {faq.question}
+                <span class="text-xl leading-none text-primary transition group-open:rotate-45">+</span>
+              </summary>
+              <p class="mt-3 text-sm leading-relaxed text-body-color">{faq.answer}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="py-20">
+    <div class="container">
+      <div class="flex flex-col items-center gap-6 rounded-3xl bg-primary px-8 py-14 text-center md:px-16">
+        <h2 class="max-w-2xl text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          Siap mencatat HPP dan stok tanpa ribet?
+        </h2>
+        <p class="max-w-xl text-base text-orange-50">
+          Coba Lokara POS gratis selama 14 hari dan mulai dari katalog produk Anda hari ini.
+        </p>
+        <a
+          href={LOKARA_APP_URL}
+          class="inline-flex items-center justify-center rounded-lg bg-white px-7 py-3.5 text-base font-semibold text-orange-600 transition hover:bg-orange-50"
+        >
+          Coba Gratis 14 Hari
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>
