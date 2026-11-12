@@ -8,36 +8,55 @@ const labelClass = 'mb-2 block text-sm font-medium text-dark';
 
 <div
   id="register-modal"
-  class="fixed inset-0 z-[10000] hidden items-end justify-center bg-dark/60 sm:items-center sm:p-4"
+  class="fixed inset-0 z-[10000] hidden items-end justify-center bg-dark/60 opacity-0 transition-opacity duration-300 sm:items-center sm:p-4"
   role="dialog"
   aria-modal="true"
   aria-labelledby="register-title"
 >
-  <div class="relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-pricing sm:max-w-[560px] sm:rounded-xl">
-    <!-- Pegangan geser khusus mobile -->
-    <div class="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-stroke sm:hidden" aria-hidden="true"></div>
+  <div
+    data-sheet-panel
+    class="relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-pricing sm:max-w-[560px] sm:rounded-xl will-change-transform"
+  >
+    <!-- Area pegangan geser khusus mobile (drag handle) -->
+    <div
+      data-drag-handle
+      class="flex w-full cursor-grab active:cursor-grabbing items-center justify-center pt-3 pb-2 touch-none select-none sm:hidden"
+      aria-label="Geser ke bawah untuk menutup atau ke atas untuk menaikkan"
+    >
+      <div class="h-1.5 w-12 rounded-full bg-stroke transition-colors"></div>
+    </div>
 
     <button
       type="button"
       data-register-close
-      class="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-2xl leading-none text-body-color hover:bg-gray-1 hover:text-dark sm:right-4 sm:top-4"
+      class="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-2xl leading-none text-body-color hover:bg-gray-1 hover:text-dark sm:right-4 sm:top-4 z-10"
       aria-label="Tutup"
     >
       &times;
     </button>
 
     <div data-register-form-view class="flex min-h-0 flex-1 flex-col">
-      <div class="shrink-0 px-6 pb-4 pt-4 pr-14 sm:px-10 sm:pt-10">
-        <h3 id="register-title" class="mb-2 text-2xl font-bold text-dark">
+      <div data-sheet-header class="shrink-0 px-6 pb-3 pt-2 pr-14 sm:px-10 sm:pt-8 select-none">
+        <h3 id="register-title" class="mb-1 text-2xl font-bold text-dark">
           Daftar Paket <span data-plan-label>Pro</span>
         </h3>
-        <p class="text-base text-body-color">
+        <p class="text-sm sm:text-base text-body-color">
           Isi data usaha Anda. Tim Lokara akan menghubungi Anda melalui email.
         </p>
       </div>
 
       <form id="register-form" novalidate class="flex min-h-0 flex-1 flex-col">
-        <div class="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 pb-2 sm:px-10">
+        <div data-scrollable-body class="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 pb-2 sm:px-10">
+          <div>
+            <label for="register-plan" class={labelClass}>Pilihan Paket*</label>
+            <select id="register-plan" name="plan" data-plan-select class={inputClass} required>
+              <option value="Basic">Basic (Rp 149.000 / bulan)</option>
+              <option value="Pro">Pro (Rp 299.000 / bulan)</option>
+              <option value="Business">Business (Rp 599.000 / bulan)</option>
+              <option value="Custom">Custom (Server Pribadi, Free Instalasi & Rebranding)</option>
+            </select>
+          </div>
+
           <div>
             <label for="register-business-name" class={labelClass}>Nama Usaha*</label>
             <input id="register-business-name" type="text" name="businessName" class={inputClass} placeholder="Contoh: Kopi Senja" maxlength="120" autocomplete="organization" required />
@@ -71,10 +90,8 @@ const labelClass = 'mb-2 block text-sm font-medium text-dark';
 
           <div>
             <label for="register-notes" class={labelClass}>Catatan (opsional)</label>
-            <textarea id="register-notes" name="notes" rows="3" class={inputClass} placeholder="Jumlah outlet, kebutuhan printer, dll." maxlength="500"></textarea>
+            <textarea id="register-notes" name="notes" rows="3" class={inputClass} placeholder="Jumlah outlet, kebutuhan server pribadi / fitur khusus, dll." maxlength="500"></textarea>
           </div>
-
-          <input type="hidden" name="plan" data-plan-input value="" />
 
           <!-- Honeypot: disembunyikan dari pengguna, hanya diisi bot -->
           <div class="hidden" aria-hidden="true">
@@ -145,6 +162,10 @@ const labelClass = 'mb-2 block text-sm font-medium text-dark';
   const form = document.getElementById('register-form') as HTMLFormElement | null;
 
   if (modal && form) {
+    const sheetPanel = modal.querySelector('[data-sheet-panel]') as HTMLElement;
+    const dragHandle = modal.querySelector('[data-drag-handle]') as HTMLElement;
+    const sheetHeader = modal.querySelector('[data-sheet-header]') as HTMLElement;
+    const scrollableBody = modal.querySelector('[data-scrollable-body]') as HTMLElement;
     const formView = modal.querySelector('[data-register-form-view]') as HTMLElement;
     const successView = modal.querySelector('[data-register-success-view]') as HTMLElement;
     const errorEl = modal.querySelector('[data-register-error]') as HTMLElement;
@@ -152,7 +173,7 @@ const labelClass = 'mb-2 block text-sm font-medium text-dark';
     const submitText = modal.querySelector('[data-submit-text]') as HTMLElement;
     const spinner = modal.querySelector('[data-spinner]') as HTMLElement;
     const planLabel = modal.querySelector('[data-plan-label]') as HTMLElement;
-    const planInput = modal.querySelector('[data-plan-input]') as HTMLInputElement;
+    const planSelect = modal.querySelector('[data-plan-select]') as HTMLSelectElement;
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const showError = (message: string) => {
@@ -182,25 +203,88 @@ const labelClass = 'mb-2 block text-sm font-medium text-dark';
       successView.classList.remove('hidden');
     };
 
+    const syncPlanLabel = (plan: string) => {
+      if (planLabel) {
+        planLabel.textContent = plan;
+      }
+    };
+
+    if (planSelect) {
+      planSelect.addEventListener('change', () => {
+        syncPlanLabel(planSelect.value);
+      });
+    }
+
     const openModal = (plan: string) => {
-      planLabel.textContent = plan;
-      planInput.value = plan;
+      if (planSelect) {
+        let matched = false;
+        for (const opt of Array.from(planSelect.options)) {
+          if (opt.value.toLowerCase() === plan.toLowerCase()) {
+            planSelect.value = opt.value;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched && !planSelect.value) {
+          planSelect.value = 'Custom';
+        }
+        syncPlanLabel(planSelect.value);
+      } else {
+        syncPlanLabel(plan);
+      }
+
       hideError();
       setLoading(false);
       showForm();
+
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       document.body.style.overflow = 'hidden';
-      // Fokus ke input pertama hanya di layar lebar, supaya keyboard mobile tidak langsung muncul.
-      if (window.matchMedia('(min-width: 640px)').matches) {
-        (form.elements.namedItem('businessName') as HTMLInputElement).focus();
+
+      const isMobile = window.innerWidth < 640;
+      if (isMobile) {
+        sheetPanel.style.transition = 'none';
+        sheetPanel.style.transform = 'translateY(100%)';
+      } else {
+        sheetPanel.style.transition = 'none';
+        sheetPanel.style.transform = 'none';
+      }
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          modal.classList.remove('opacity-0');
+          modal.classList.add('opacity-100');
+          if (isMobile) {
+            sheetPanel.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+            sheetPanel.style.transform = 'translateY(0)';
+          }
+        });
+      });
+
+      if (!isMobile) {
+        (form.elements.namedItem('businessName') as HTMLInputElement)?.focus();
       }
     };
 
     const closeModal = () => {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      document.body.style.overflow = '';
+      if (modal.classList.contains('hidden')) return;
+
+      const isMobile = window.innerWidth < 640;
+      if (isMobile) {
+        sheetPanel.style.transition = 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
+        sheetPanel.style.transform = 'translateY(100%)';
+      }
+      modal.classList.remove('opacity-100');
+      modal.classList.add('opacity-0');
+
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        modal.style.backgroundColor = '';
+        sheetPanel.style.transition = '';
+        sheetPanel.style.transform = '';
+        document.body.style.overflow = '';
+      }, 250);
     };
 
     document.querySelectorAll<HTMLElement>('[data-register-open]').forEach((button) => {
@@ -219,6 +303,139 @@ const labelClass = 'mb-2 block text-sm font-medium text-dark';
       if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
     });
 
+    // Swiper drag & gesture logic (bisa diturunkan dan dinaikkan)
+    let isDragging = false;
+    let startY = 0;
+    let currentY = 0;
+    let startTime = 0;
+    let dragZone: 'handle' | 'header' | 'body' | null = null;
+
+    const handleDragStart = (clientY: number, zone: 'handle' | 'header' | 'body') => {
+      if (window.innerWidth >= 640) return;
+      startY = clientY;
+      currentY = clientY;
+      startTime = Date.now();
+      dragZone = zone;
+
+      if (zone === 'handle' || zone === 'header') {
+        isDragging = true;
+        sheetPanel.style.transition = 'none';
+      }
+    };
+
+    const handleDragMove = (clientY: number, e?: Event) => {
+      if (window.innerWidth >= 640 || !dragZone) return;
+
+      currentY = clientY;
+      const deltaY = currentY - startY;
+
+      if (dragZone === 'body') {
+        if (!isDragging) {
+          if (scrollableBody && scrollableBody.scrollTop <= 0 && deltaY > 10) {
+            isDragging = true;
+            sheetPanel.style.transition = 'none';
+            startY = currentY;
+          } else {
+            return;
+          }
+        }
+      }
+
+      if (isDragging) {
+        if (e && e.cancelable) {
+          e.preventDefault();
+        }
+
+        if (deltaY >= 0) {
+          // Menurunkan (Pull down)
+          sheetPanel.style.transform = `translateY(${deltaY}px)`;
+          const opacity = Math.max(0.15, 0.6 * (1 - deltaY / 400));
+          modal.style.backgroundColor = `rgba(17, 25, 40, ${opacity})`;
+        } else {
+          // Menaikkan (Pull up / return back up)
+          const resistance = deltaY * 0.2;
+          sheetPanel.style.transform = `translateY(${resistance}px)`;
+        }
+      }
+    };
+
+    const handleDragEnd = () => {
+      if (!isDragging) {
+        dragZone = null;
+        return;
+      }
+
+      isDragging = false;
+      const deltaY = currentY - startY;
+      const duration = Math.max(1, Date.now() - startTime);
+      const velocity = deltaY / duration;
+
+      sheetPanel.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+
+      if (deltaY > 100 || (velocity > 0.35 && deltaY > 30)) {
+        closeModal();
+      } else {
+        sheetPanel.style.transform = 'translateY(0)';
+        modal.style.backgroundColor = '';
+        setTimeout(() => {
+          if (!isDragging) {
+            sheetPanel.style.transition = '';
+          }
+        }, 260);
+      }
+
+      dragZone = null;
+    };
+
+    // Touch listeners
+    if (dragHandle) {
+      dragHandle.addEventListener('touchstart', (e) => handleDragStart(e.touches[0].clientY, 'handle'), { passive: true });
+    }
+    if (sheetHeader) {
+      sheetHeader.addEventListener('touchstart', (e) => handleDragStart(e.touches[0].clientY, 'header'), { passive: true });
+    }
+    if (scrollableBody) {
+      scrollableBody.addEventListener('touchstart', (e) => handleDragStart(e.touches[0].clientY, 'body'), { passive: true });
+    }
+
+    window.addEventListener('touchmove', (e) => {
+      if (isDragging || dragZone) {
+        handleDragMove(e.touches[0].clientY, e);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', handleDragEnd);
+    window.addEventListener('touchcancel', handleDragEnd);
+
+    // Mouse / Pointer listeners (desktop / emulation)
+    let isMouseDown = false;
+    const onMouseDown = (e: MouseEvent, zone: 'handle' | 'header') => {
+      if (window.innerWidth >= 640) return;
+      isMouseDown = true;
+      handleDragStart(e.clientY, zone);
+    };
+
+    if (dragHandle) {
+      dragHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'handle'));
+    }
+    if (sheetHeader) {
+      sheetHeader.addEventListener('mousedown', (e) => onMouseDown(e, 'header'));
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      if (isMouseDown && (isDragging || dragZone)) {
+        handleDragMove(e.clientY, e);
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isMouseDown) {
+        isMouseDown = false;
+        handleDragEnd();
+      }
+    });
+
+    // Form submission
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       hideError();
@@ -250,7 +467,10 @@ const labelClass = 'mb-2 block text-sm font-medium text-dark';
           throw new Error(result.message || 'Gagal mengirim pendaftaran. Silakan coba lagi.');
         }
         form.reset();
-        planInput.value = planLabel.textContent || '';
+        if (planSelect) {
+          planSelect.value = 'Pro';
+          syncPlanLabel('Pro');
+        }
         showSuccess();
       } catch (error) {
         showError(error instanceof Error ? error.message : 'Gagal mengirim pendaftaran.');

@@ -9,7 +9,11 @@ interface Props {
   image?: string;
 }
 
-const { description, title, image } = Astro.props;
+const { description, title, image = '/assets/og/lokara-banner.png' } = Astro.props;
+// Gambar dan URL OG harus absolut agar terbaca WhatsApp, Facebook, dan Twitter.
+// Isi `site` di astro.config.mjs dengan domain produksi.
+const ogImage = Astro.site ? new URL(image, Astro.site).toString() : image;
+const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
 ---
 
 <!DOCTYPE html>
@@ -23,8 +27,19 @@ const { description, title, image } = Astro.props;
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta property="og:image" content={image} />
-    <meta property="twitter:image" content={image} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Lokara POS" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Lokara POS: kasir multi-outlet dengan HPP dan stok otomatis" />
+    {ogUrl && <meta property="og:url" content={ogUrl} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <title>{title}</title>
   </head>
   <body>
